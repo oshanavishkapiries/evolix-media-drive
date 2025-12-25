@@ -1,22 +1,21 @@
-import { MediaCard, MediaCardSkeleton } from "@/components/media-card";
-import type { MediaLibrary } from "@/types/media";
+import { MediaCard } from "@/components/media-card";
+import type { MediaLibrary, Movie } from "@/types/media";
 
-async function getMovies() {
+async function getMovies(): Promise<Movie[]> {
     const isConfigured = Boolean(
         process.env.GD_SERVICE_B64 &&
-        process.env.ENCRYPTION_KEY &&
         process.env.GD_ROOT_FOLDER
     );
 
     if (!isConfigured) {
         // Demo movies
         return [
-            { id: "1", encryptedId: "1", title: "Inception", year: 2010, path: "", file: { id: "1", encryptedId: "1", name: "", path: "", mimeType: "", modifiedTime: "" } },
-            { id: "2", encryptedId: "2", title: "The Dark Knight", year: 2008, path: "", file: { id: "2", encryptedId: "2", name: "", path: "", mimeType: "", modifiedTime: "" } },
-            { id: "3", encryptedId: "3", title: "Interstellar", year: 2014, path: "", file: { id: "3", encryptedId: "3", name: "", path: "", mimeType: "", modifiedTime: "" } },
-            { id: "4", encryptedId: "4", title: "The Matrix", year: 1999, path: "", file: { id: "4", encryptedId: "4", name: "", path: "", mimeType: "", modifiedTime: "" } },
-            { id: "5", encryptedId: "5", title: "Pulp Fiction", year: 1994, path: "", file: { id: "5", encryptedId: "5", name: "", path: "", mimeType: "", modifiedTime: "" } },
-            { id: "6", encryptedId: "6", title: "Fight Club", year: 1999, path: "", file: { id: "6", encryptedId: "6", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "1", folderId: "demo-1", title: "Inception", year: 2010, path: "", file: { id: "1", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "2", folderId: "demo-2", title: "The Dark Knight", year: 2008, path: "", file: { id: "2", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "3", folderId: "demo-3", title: "Interstellar", year: 2014, path: "", file: { id: "3", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "4", folderId: "demo-4", title: "The Matrix", year: 1999, path: "", file: { id: "4", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "5", folderId: "demo-5", title: "Pulp Fiction", year: 1994, path: "", file: { id: "5", name: "", path: "", mimeType: "", modifiedTime: "" } },
+            { id: "6", folderId: "demo-6", title: "Fight Club", year: 1999, path: "", file: { id: "6", name: "", path: "", mimeType: "", modifiedTime: "" } },
         ];
     }
 

@@ -191,3 +191,80 @@ export function isVideoFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase();
   return ext ? videoExtensions.includes(ext) : false;
 }
+
+/**
+ * Check if file is a subtitle file
+ */
+export function isSubtitleFile(filename: string): boolean {
+  const subtitleExtensions = ["srt", "vtt", "sub", "ass", "ssa"];
+  const ext = filename.split(".").pop()?.toLowerCase();
+  return ext ? subtitleExtensions.includes(ext) : false;
+}
+
+/**
+ * Parse subtitle filename to extract language code
+ * Examples:
+ * - "Movie Name (2020).en.srt" -> "en"
+ * - "Show - s01e01.eng.srt" -> "eng"
+ * - "Show - s01e01.english.srt" -> "english"
+ */
+export function parseSubtitleLanguage(filename: string): {
+  language: string;
+  label: string;
+} {
+  const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
+  const parts = nameWithoutExt.split(".");
+
+  // Take the last part before extension as potential language
+  const langPart = parts[parts.length - 1]?.toLowerCase() || "unknown";
+
+  // Common language code mappings
+  const languageLabels: Record<string, string> = {
+    en: "English",
+    eng: "English",
+    english: "English",
+    es: "Spanish",
+    spa: "Spanish",
+    spanish: "Spanish",
+    fr: "French",
+    fra: "French",
+    french: "French",
+    de: "German",
+    deu: "German",
+    german: "German",
+    it: "Italian",
+    ita: "Italian",
+    italian: "Italian",
+    pt: "Portuguese",
+    por: "Portuguese",
+    portuguese: "Portuguese",
+    ja: "Japanese",
+    jpn: "Japanese",
+    japanese: "Japanese",
+    ko: "Korean",
+    kor: "Korean",
+    korean: "Korean",
+    zh: "Chinese",
+    chi: "Chinese",
+    chinese: "Chinese",
+    ru: "Russian",
+    rus: "Russian",
+    russian: "Russian",
+    ar: "Arabic",
+    ara: "Arabic",
+    arabic: "Arabic",
+    hi: "Hindi",
+    hin: "Hindi",
+    hindi: "Hindi",
+  };
+
+  const label =
+    languageLabels[langPart] ||
+    langPart.charAt(0).toUpperCase() + langPart.slice(1);
+  const srclang = langPart.length <= 3 ? langPart : langPart.slice(0, 2);
+
+  return {
+    language: srclang,
+    label,
+  };
+}

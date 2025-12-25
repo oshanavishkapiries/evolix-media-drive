@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getFileStream, getFileMetadata } from "@/lib/gdrive";
-import { decrypt } from "@/lib/encryption";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +14,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: encryptedId } = await params;
-
-    // Decrypt the file ID
-    const fileId = decrypt(encryptedId);
-    if (!fileId) {
-      return NextResponse.json({ error: "Invalid file ID" }, { status: 400 });
-    }
+    const { id: fileId } = await params;
 
     // Get file metadata first
     const metadata = await getFileMetadata(fileId);

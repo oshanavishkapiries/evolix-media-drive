@@ -12,13 +12,15 @@ interface HeroBannerProps {
 }
 
 export function HeroBanner({ media, type }: HeroBannerProps) {
-    const watchUrl = type === "movie"
-        ? `/watch/${media.encryptedId}`
-        : `/tv/${media.encryptedId}`;
+    // For movies, we need folderId for the watch page
+    // For TV shows, we go to the show page to select an episode
+    const watchUrl = type === "movie" && "folderId" in media
+        ? `/watch/${media.folderId}/${media.id}`
+        : `/tv/${media.id}`;
 
     const detailUrl = type === "movie"
-        ? `/movies/${media.encryptedId}`
-        : `/tv/${media.encryptedId}`;
+        ? `/movies/${media.id}`
+        : `/tv/${media.id}`;
 
     return (
         <div className="relative w-full h-[80vh] min-h-[500px] max-h-[800px]">

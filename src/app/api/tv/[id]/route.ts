@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
-import { decrypt, encrypt } from "@/lib/encryption";
 import {
   listFolderContents,
   getFileMetadata,
   listSubfolders,
 } from "@/lib/gdrive";
+import type { DriveFile } from "@/lib/gdrive";
 import {
   parseMediaFilename,
   parseTVShowFolder,
   parseSeasonFolder,
   isVideoFile,
+  isSubtitleFile,
+  parseSubtitleLanguage,
 } from "@/lib/parser";
 import {
   getTVShowDetails,
@@ -18,33 +20,72 @@ import {
   getTMDBImageUrl,
   getSeasonDetails,
 } from "@/lib/tmdb";
-import type { TVShow, Season, Episode, MediaFile } from "@/types/media";
+import type {
+  TVShow,
+  Season,
+  Episode,
+  MediaFile,
+  SubtitleFile,
+} from "@/types/media";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 /**
- * Get a single TV show by encrypted folder ID
+ * Find subtitle files that match a video file's base name
+ */
+function findMatchingSubtitles(
+  videoFileName: string,
+  allFiles: DriveFile[]
+): SubtitleFile[] {
+  const subtitles: SubtitleFile[] = [];
+
+  const videoBaseName = videoFileName
+    .substring(0, videoFileName.lastIndexOf("."))
+    .trim();
+  if (!videoBaseName) return [];
+
+  for (const file of allFiles) {
+    if (!isSubtitleFile(file.name)) continue;
+
+    const subtitleName = file.name.trim();
+    const subtitleBaseName = subtitleName
+      .substring(0, subtitleName.lastIndexOf("."))
+      .trim();
+
+    const matches =
+      subtitleBaseName === videoBaseName ||
+      subtitleBaseName.startsWith(videoBaseName + ".") ||
+      subtitleBaseName.startsWith(videoBaseName);
+
+    if (matches) {
+      const { language, label } = parseSubtitleLanguage(file.name);
+      subtitles.push({
+        id: file.id,
+        name: file.name,
+        language,
+        label,
+      });
+    }
+  }
+
+  return subtitles;
+}
+
+/**
+ * Get a single TV show by folder ID
  * GET /api/tv/[id]
  */
 export async function GET(request: Request, { params }: RouteParams) {
   try {
-    const { id: encryptedId } = await params;
+    const { id: folderId } = await params;
 
-    // Decrypt the folder ID
-    const folderId = decrypt(encryptedId);
-    if (!folderId) {
-      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
-    }
-
-    // Get folder metadata
     const folderMetadata = await getFileMetadata(folderId);
     if (!folderMetadata) {
       return NextResponse.json({ error: "TV show not found" }, { status: 404 });
     }
 
-    // Parse folder name
     const parsed = parseTVShowFolder(folderMetadata.name);
     if (!parsed) {
       return NextResponse.json(
@@ -53,43 +94,44 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Get season folders
     const seasonFolders = await listSubfolders(folderId);
     const seasons: Season[] = [];
     let totalEpisodes = 0;
 
-    // Process each season folder
     for (const seasonFolder of seasonFolders) {
       const seasonNumber = parseSeasonFolder(seasonFolder.name);
       if (seasonNumber === null) continue;
 
-      // Get episodes in this season
-      const { files } = await listFolderContents(seasonFolder.id);
+      const { files: allFilesInSeason } = await listFolderContents(
+        seasonFolder.id
+      );
       const episodes: Episode[] = [];
 
-      for (const file of files) {
+      for (const file of allFilesInSeason) {
         if (!isVideoFile(file.name)) continue;
 
         const episodeParsed = parseMediaFilename(file.name);
         if (!episodeParsed || episodeParsed.episodeNumber === undefined)
           continue;
 
+        const subtitles = findMatchingSubtitles(file.name, allFilesInSeason);
+
         const episode: Episode = {
           id: file.id,
-          encryptedId: encrypt(file.id),
+          folderId: seasonFolder.id, // Season folder for subtitle lookup
           seasonNumber: episodeParsed.seasonNumber || seasonNumber,
           episodeNumber: episodeParsed.episodeNumber,
           title: episodeParsed.episodeTitle,
           path: file.name,
           file: {
             id: file.id,
-            encryptedId: encrypt(file.id),
             name: file.name,
             path: file.name,
             mimeType: file.mimeType,
             size: file.size ? parseInt(file.size, 10) : undefined,
             modifiedTime: file.modifiedTime || "",
           } as MediaFile,
+          subtitles: subtitles.length > 0 ? subtitles : undefined,
           thumbnail: file.thumbnailLink || undefined,
         };
 
@@ -97,7 +139,6 @@ export async function GET(request: Request, { params }: RouteParams) {
         totalEpisodes++;
       }
 
-      // Sort episodes by episode number
       episodes.sort((a, b) => a.episodeNumber - b.episodeNumber);
 
       seasons.push({
@@ -107,13 +148,10 @@ export async function GET(request: Request, { params }: RouteParams) {
       });
     }
 
-    // Sort seasons by season number
     seasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
 
-    // Build TV show object
     const tvShow: TVShow = {
       id: folderId,
-      encryptedId,
       title: parsed.title,
       year: parsed.year,
       path: folderMetadata.name,
@@ -123,10 +161,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       tvdbId: parsed.tvdbId,
     };
 
-    // Fetch TMDB data if configured
     if (isTMDBConfigured()) {
       let tmdbData = null;
-
       if (parsed.tmdbId) {
         tmdbData = await getTVShowDetails(parsed.tmdbId);
       } else {
@@ -143,7 +179,6 @@ export async function GET(request: Request, { params }: RouteParams) {
         tvShow.overview = tmdbData.overview;
         tvShow.rating = tmdbData.rating;
 
-        // Add season posters if available
         if (tmdbData.seasons) {
           for (const season of seasons) {
             const tmdbSeason = tmdbData.seasons.find(
@@ -155,7 +190,6 @@ export async function GET(request: Request, { params }: RouteParams) {
           }
         }
 
-        // Fetch episode stills for each season
         const tmdbId = tvShow.tmdbId;
         if (tmdbId) {
           for (const season of seasons) {
@@ -169,11 +203,9 @@ export async function GET(request: Request, { params }: RouteParams) {
                   (e) => e.episodeNumber === episode.episodeNumber
                 );
                 if (tmdbEpisode) {
-                  // Use TMDB still as thumbnail if no Google Drive thumbnail
                   if (!episode.thumbnail && tmdbEpisode.stillUrl) {
                     episode.thumbnail = tmdbEpisode.stillUrl;
                   }
-                  // Add episode title and overview from TMDB if not already set
                   if (!episode.title && tmdbEpisode.name) {
                     episode.title = tmdbEpisode.name;
                   }

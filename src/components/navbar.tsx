@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -13,6 +14,20 @@ const navigation = [
 
 export function Navbar() {
     const pathname = usePathname();
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Detect scroll to change navbar background
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        // Check initial scroll position
+        handleScroll();
+
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     // Hide navbar on watch pages for immersive video experience
     if (pathname?.startsWith("/watch")) {
@@ -20,9 +35,19 @@ export function Navbar() {
     }
 
     return (
-        <header className="fixed top-0 z-50 w-full">
-            {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent pointer-events-none" />
+        <header
+            className={cn(
+                "fixed top-0 z-50 w-full transition-all duration-300",
+                isScrolled ? "bg-background" : "bg-transparent"
+            )}
+        >
+            {/* Gradient background - only show when not scrolled */}
+            <div
+                className={cn(
+                    "absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent pointer-events-none transition-opacity duration-300",
+                    isScrolled ? "opacity-0" : "opacity-100"
+                )}
+            />
 
             <nav className="relative flex items-center px-4 md:px-12 py-4">
                 {/* Logo and Navigation */}

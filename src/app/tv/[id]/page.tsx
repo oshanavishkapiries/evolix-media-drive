@@ -143,7 +143,7 @@ export default async function TVShowPage({ params }: TVShowPageProps) {
                             {firstEpisode && (
                                 <div className="flex gap-3 mt-2">
                                     <Button asChild size="lg" className="gap-2">
-                                        <Link href={`/watch/${firstEpisode.encryptedId}`}>
+                                        <Link href={`/watch/${firstEpisode.folderId}/${firstEpisode.id}`}>
                                             <Play className="w-5 h-5 fill-current" />
                                             Play S1:E1
                                         </Link>

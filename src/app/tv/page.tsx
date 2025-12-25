@@ -1,22 +1,21 @@
 import { MediaCard } from "@/components/media-card";
-import type { MediaLibrary } from "@/types/media";
+import type { MediaLibrary, TVShow } from "@/types/media";
 
-async function getTVShows() {
+async function getTVShows(): Promise<TVShow[]> {
     const isConfigured = Boolean(
         process.env.GD_SERVICE_B64 &&
-        process.env.ENCRYPTION_KEY &&
         process.env.GD_ROOT_FOLDER
     );
 
     if (!isConfigured) {
         // Demo TV shows
         return [
-            { id: "1", encryptedId: "1", title: "Breaking Bad", year: 2008, path: "", seasons: [], totalEpisodes: 62 },
-            { id: "2", encryptedId: "2", title: "Game of Thrones", year: 2011, path: "", seasons: [], totalEpisodes: 73 },
-            { id: "3", encryptedId: "3", title: "The Office (US)", year: 2005, path: "", seasons: [], totalEpisodes: 201 },
-            { id: "4", encryptedId: "4", title: "Stranger Things", year: 2016, path: "", seasons: [], totalEpisodes: 34 },
-            { id: "5", encryptedId: "5", title: "The Mandalorian", year: 2019, path: "", seasons: [], totalEpisodes: 24 },
-            { id: "6", encryptedId: "6", title: "Friends", year: 1994, path: "", seasons: [], totalEpisodes: 236 },
+            { id: "1", title: "Breaking Bad", year: 2008, path: "", seasons: [], totalEpisodes: 62 },
+            { id: "2", title: "Game of Thrones", year: 2011, path: "", seasons: [], totalEpisodes: 73 },
+            { id: "3", title: "The Office (US)", year: 2005, path: "", seasons: [], totalEpisodes: 201 },
+            { id: "4", title: "Stranger Things", year: 2016, path: "", seasons: [], totalEpisodes: 34 },
+            { id: "5", title: "The Mandalorian", year: 2019, path: "", seasons: [], totalEpisodes: 24 },
+            { id: "6", title: "Friends", year: 1994, path: "", seasons: [], totalEpisodes: 236 },
         ];
     }
 

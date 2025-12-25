@@ -100,7 +100,7 @@ interface EpisodeCardProps {
 function EpisodeCard({ episode, showTitle }: EpisodeCardProps) {
     return (
         <Link
-            href={`/watch/${episode.encryptedId}`}
+            href={`/watch/${episode.folderId}/${episode.id}`}
             className="group flex gap-4 p-3 rounded-lg hover:bg-gray-800/50 transition-colors"
         >
             {/* Episode Number */}

@@ -1,12 +1,12 @@
 /**
  * Media Library Type Definitions
+ * Simplified - using plain Google Drive IDs (no encryption)
  */
 
 export type MediaType = "movie" | "tvshow";
 
 export interface MediaFile {
   id: string;
-  encryptedId: string;
   name: string;
   path: string;
   mimeType: string;
@@ -14,13 +14,21 @@ export interface MediaFile {
   modifiedTime: string;
 }
 
+export interface SubtitleFile {
+  id: string;
+  name: string;
+  language: string; // e.g., "en", "es"
+  label: string; // e.g., "English", "Spanish"
+}
+
 export interface Movie {
   id: string;
-  encryptedId: string;
+  folderId: string; // Parent folder ID for subtitle lookup
   title: string;
   year?: number;
   path: string;
   file: MediaFile;
+  subtitles?: SubtitleFile[];
   thumbnail?: string;
   poster?: string;
   backdrop?: string;
@@ -32,13 +40,14 @@ export interface Movie {
 
 export interface Episode {
   id: string;
-  encryptedId: string;
+  folderId: string; // Season folder ID for subtitle lookup
   seasonNumber: number;
   episodeNumber: number;
   title?: string;
   airDate?: string;
   path: string;
   file: MediaFile;
+  subtitles?: SubtitleFile[];
   thumbnail?: string;
   overview?: string;
 }
@@ -52,7 +61,6 @@ export interface Season {
 
 export interface TVShow {
   id: string;
-  encryptedId: string;
   title: string;
   year?: number;
   path: string;
@@ -78,10 +86,10 @@ export interface ParsedFilename {
   year?: number;
   seasonNumber?: number;
   episodeNumber?: number;
-  episodeEndNumber?: number; // For multi-episode files like s02e01-e03
+  episodeEndNumber?: number;
   episodeTitle?: string;
-  part?: number; // For multi-part episodes
-  date?: string; // For date-based episodes like "2011-11-15"
+  part?: number;
+  date?: string;
   tmdbId?: number;
   tvdbId?: number;
   extension: string;
@@ -91,10 +99,10 @@ export interface ParsedFilename {
 export interface WatchProgress {
   mediaId: string;
   mediaType: MediaType;
-  progress: number; // Percentage 0-100
-  currentTime: number; // Seconds
-  duration: number; // Seconds
-  lastWatched: string; // ISO date
+  progress: number;
+  currentTime: number;
+  duration: number;
+  lastWatched: string;
   seasonNumber?: number;
   episodeNumber?: number;
 }

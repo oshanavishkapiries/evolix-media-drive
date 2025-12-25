@@ -117,11 +117,18 @@ export async function getFileMetadata(
     const response = await drive.files.get({
       fileId,
       fields: "id, name, mimeType, size, modifiedTime, thumbnailLink, parents",
-      supportsAllDrives: isTeamDrive(),
+      supportsAllDrives: true, // Always enable for shared files
+    });
+
+    console.log("[GDrive] getFileMetadata response:", {
+      id: response.data.id,
+      name: response.data.name,
+      parents: response.data.parents,
     });
 
     return response.data as DriveFile;
-  } catch {
+  } catch (error) {
+    console.error("[GDrive] getFileMetadata error:", error);
     return null;
   }
 }
@@ -264,4 +271,24 @@ export async function listSubfolders(folderId: string): Promise<DriveFile[]> {
 
   const response = await drive.files.list(params);
   return (response.data.files || []) as DriveFile[];
+}
+
+/**
+ * Get subtitle file content as text
+ */
+export async function getSubtitleContent(fileId: string): Promise<string> {
+  const drive = getDriveClient();
+
+  const response = await drive.files.get(
+    {
+      fileId,
+      alt: "media",
+      supportsAllDrives: isTeamDrive(),
+    },
+    {
+      responseType: "text",
+    }
+  );
+
+  return response.data as string;
 }

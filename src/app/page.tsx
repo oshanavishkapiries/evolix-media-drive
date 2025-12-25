@@ -7,53 +7,53 @@ const demoLibrary: MediaLibrary = {
   movies: [
     {
       id: "demo-1",
-      encryptedId: "demo-1",
+      folderId: "demo-folder-1",
       title: "Inception",
       year: 2010,
       path: "Inception (2010).mp4",
-      file: { id: "demo-1", encryptedId: "demo-1", name: "Inception (2010).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
+      file: { id: "demo-1", name: "Inception (2010).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
       overview: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
       rating: 8.8,
       runtime: 148,
     },
     {
       id: "demo-2",
-      encryptedId: "demo-2",
+      folderId: "demo-folder-2",
       title: "The Dark Knight",
       year: 2008,
       path: "The Dark Knight (2008).mp4",
-      file: { id: "demo-2", encryptedId: "demo-2", name: "The Dark Knight (2008).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
+      file: { id: "demo-2", name: "The Dark Knight (2008).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
       overview: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
       rating: 9.0,
       runtime: 152,
     },
     {
       id: "demo-3",
-      encryptedId: "demo-3",
+      folderId: "demo-folder-3",
       title: "Interstellar",
       year: 2014,
       path: "Interstellar (2014).mp4",
-      file: { id: "demo-3", encryptedId: "demo-3", name: "Interstellar (2014).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
+      file: { id: "demo-3", name: "Interstellar (2014).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
       rating: 8.6,
       runtime: 169,
     },
     {
       id: "demo-4",
-      encryptedId: "demo-4",
+      folderId: "demo-folder-4",
       title: "The Matrix",
       year: 1999,
       path: "The Matrix (1999).mp4",
-      file: { id: "demo-4", encryptedId: "demo-4", name: "The Matrix (1999).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
+      file: { id: "demo-4", name: "The Matrix (1999).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
       rating: 8.7,
       runtime: 136,
     },
     {
       id: "demo-5",
-      encryptedId: "demo-5",
+      folderId: "demo-folder-5",
       title: "Pulp Fiction",
       year: 1994,
       path: "Pulp Fiction (1994).mp4",
-      file: { id: "demo-5", encryptedId: "demo-5", name: "Pulp Fiction (1994).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
+      file: { id: "demo-5", name: "Pulp Fiction (1994).mp4", path: "", mimeType: "video/mp4", modifiedTime: "" },
       rating: 8.9,
       runtime: 154,
     },
@@ -61,7 +61,6 @@ const demoLibrary: MediaLibrary = {
   tvShows: [
     {
       id: "demo-tv-1",
-      encryptedId: "demo-tv-1",
       title: "Breaking Bad",
       year: 2008,
       path: "Breaking Bad (2008)",
@@ -72,7 +71,6 @@ const demoLibrary: MediaLibrary = {
     },
     {
       id: "demo-tv-2",
-      encryptedId: "demo-tv-2",
       title: "Game of Thrones",
       year: 2011,
       path: "Game of Thrones (2011)",
@@ -82,7 +80,6 @@ const demoLibrary: MediaLibrary = {
     },
     {
       id: "demo-tv-3",
-      encryptedId: "demo-tv-3",
       title: "The Office (US)",
       year: 2005,
       path: "The Office (US) (2005)",
@@ -92,7 +89,6 @@ const demoLibrary: MediaLibrary = {
     },
     {
       id: "demo-tv-4",
-      encryptedId: "demo-tv-4",
       title: "Stranger Things",
       year: 2016,
       path: "Stranger Things (2016)",
@@ -105,20 +101,16 @@ const demoLibrary: MediaLibrary = {
 };
 
 async function getMediaLibrary(): Promise<MediaLibrary> {
-  // Check if Google Drive is configured
   const isConfigured = Boolean(
     process.env.GD_SERVICE_B64 &&
-    process.env.ENCRYPTION_KEY &&
     process.env.GD_ROOT_FOLDER
   );
 
   if (!isConfigured) {
-    // Return demo data if not configured
     return demoLibrary;
   }
 
   try {
-    // In production, call the scan API
     const baseUrl = process.env.NEXT_PUBLIC_DOMAIN || "http://localhost:3000";
     const response = await fetch(`${baseUrl}/api/scan`, {
       cache: "no-store",
@@ -138,23 +130,19 @@ async function getMediaLibrary(): Promise<MediaLibrary> {
 export default async function HomePage() {
   const library = await getMediaLibrary();
 
-  // Get featured item (random movie or first one)
   const featuredMovie = library.movies.length > 0
     ? library.movies[Math.floor(Math.random() * Math.min(5, library.movies.length))]
     : null;
 
   return (
     <div className="min-h-screen">
-      {/* Hero Banner */}
       {featuredMovie ? (
         <HeroBanner media={featuredMovie} type="movie" />
       ) : (
         <HeroBannerSkeleton />
       )}
 
-      {/* Content Carousels */}
       <div className="-mt-32 relative z-10 space-y-8 pb-16">
-        {/* Movies */}
         {library.movies.length > 0 && (
           <MediaCarousel
             title="Movies"
@@ -163,7 +151,6 @@ export default async function HomePage() {
           />
         )}
 
-        {/* TV Shows */}
         {library.tvShows.length > 0 && (
           <MediaCarousel
             title="TV Shows"
@@ -172,7 +159,6 @@ export default async function HomePage() {
           />
         )}
 
-        {/* Recently Added - using movies for now */}
         {library.movies.length > 0 && (
           <MediaCarousel
             title="Recently Added"
@@ -182,7 +168,6 @@ export default async function HomePage() {
         )}
       </div>
 
-      {/* Configuration Notice */}
       {!process.env.GD_SERVICE_B64 && (
         <div className="fixed bottom-4 right-4 bg-yellow-500/90 text-black px-4 py-2 rounded-lg text-sm font-medium">
           ⚠️ Demo Mode - Configure .env to connect Google Drive

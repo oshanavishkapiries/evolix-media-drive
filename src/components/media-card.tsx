@@ -14,8 +14,8 @@ interface MediaCardProps {
 
 export function MediaCard({ media, type, className }: MediaCardProps) {
     const href = type === "movie"
-        ? `/movies/${media.encryptedId}`
-        : `/tv/${media.encryptedId}`;
+        ? `/movies/${media.id}`
+        : `/tv/${media.id}`;
 
     return (
         <Link
