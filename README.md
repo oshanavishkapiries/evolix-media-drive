@@ -4,18 +4,7 @@ A Netflix-like media streaming platform that uses Google Drive as storage. Strea
 
 ![Evolix](public/svg/evolix.svg)
 
-## ✨ Features
-
-- 🎬 **Netflix-style UI** - Beautiful, responsive design with hero banners and media carousels
-- 📁 **Google Drive Storage** - Use your Google Drive as a media server
-- 🎯 **Auto Metadata** - Automatically fetches posters, backdrops, ratings, and descriptions from TMDB
-- 📺 **TV Show Support** - Full support for seasons and episodes with TMDB episode data
-- 📝 **Subtitle Support** - Auto-detects `.srt`, `.vtt`, `.ass`, `.sub` files alongside videos
-- 🔐 **Secure Streaming** - Encrypted file IDs to protect your media URLs
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
-- 🎨 **Dark Theme** - Eye-friendly dark theme with accent colors
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -172,77 +161,3 @@ Place subtitle files alongside videos with matching names:
 
 **Supported language codes:** `en`, `es`, `fr`, `de`, `ja`, `ko`, `zh`, `pt`, `ar`, `hi`, and more
 
-## 🔧 API Endpoints
-
-| Endpoint                 | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| `GET /api/scan`          | Scan media library and return all movies/shows |
-| `GET /api/movie/[id]`    | Get movie details with subtitles               |
-| `GET /api/tv/[id]`       | Get TV show with seasons and episodes          |
-| `GET /api/video/[id]`    | Get video info for player (with subtitles)     |
-| `GET /api/stream/[id]`   | Stream video file                              |
-| `GET /api/subtitle/[id]` | Get subtitle file (converts SRT to VTT)        |
-
-## 🎨 Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
-- **Icons:** Lucide React
-- **API:** Google Drive API, TMDB API
-- **Language:** TypeScript
-
-## 📂 Project Structure
-
-```
-src/
-├── app/
-│   ├── api/           # API routes
-│   │   ├── movie/     # Movie details endpoint
-│   │   ├── tv/        # TV show details endpoint
-│   │   ├── video/     # Video info for player
-│   │   ├── stream/    # Video streaming
-│   │   ├── subtitle/  # Subtitle streaming
-│   │   └── scan/      # Media library scanner
-│   ├── movies/        # Movies pages
-│   ├── tv/            # TV shows pages
-│   └── watch/         # Video player page
-├── components/        # React components
-│   ├── evolix-player.tsx  # Video player component
-│   ├── media-card.tsx     # Media card component
-│   ├── media-carousel.tsx # Horizontal carousel
-│   ├── hero-banner.tsx    # Hero banner
-│   └── navbar.tsx         # Navigation bar
-├── lib/               # Utility functions
-│   ├── gdrive.ts      # Google Drive API wrapper
-│   ├── tmdb.ts        # TMDB API wrapper
-│   ├── parser.ts      # Filename parsing
-│   └── encryption.ts  # File ID encryption
-└── types/             # TypeScript types
-    └── media.ts       # Media type definitions
-```
-
-## 🚀 Deployment
-
-### Deploy on Vercel
-
-1. Push your code to GitHub
-2. Import project on [Vercel](https://vercel.com)
-3. Add environment variables in Vercel dashboard
-4. Deploy!
-
-### Self-Hosting
-
-```bash
-npm run build
-npm start
-```
-
-## 📄 License
-
-This project is for personal use only.
-
-## 🙏 Acknowledgments
-
-- [TMDB](https://www.themoviedb.org) for movie/TV metadata
-- [Google Drive API](https://developers.google.com/drive) for storage
-- [Next.js](https://nextjs.org) for the framework
