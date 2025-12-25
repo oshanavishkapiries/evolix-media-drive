@@ -3,26 +3,132 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evolix-player-core</title>
-    <!--  Fullscreen Video CSS -->
+    <title>Evolix Player</title>
+    <link rel="icon" href="/favicon.ico" />
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Player Styles -->
+    <link rel="stylesheet" href="style.css" />
+
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
+
+      body {
+        background: #000;
+        font-family:
+          "Rubik",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+
       #player {
         position: absolute;
         width: 100% !important;
         height: 100% !important;
       }
+
+      /* Loading state before player initializes */
+      .player-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: #000;
+        color: #fff;
+      }
+
+      .player-loading .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid #333;
+        border-top-color: #ffd700;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .player-loading p {
+        margin-top: 20px;
+        color: #888;
+        font-size: 14px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Back button */
+      .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999;
+        padding: 10px 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        border: 1px solid #333;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: "Rubik", sans-serif;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+      }
+
+      .back-button:hover {
+        background: rgba(255, 215, 0, 0.8);
+        border-color: #ffd700;
+      }
+
+      .back-button svg {
+        width: 16px;
+        height: 16px;
+      }
     </style>
-    <link rel="stylesheet" href="style.css" />
   </head>
-  <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
   <body>
-    <!-- Player -->
-    <div id="player"></div>
+    <!-- Back Button -->
+    <button class="back-button" onclick="history.back()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Back
+    </button>
+
+    <!-- Player Container -->
+    <div id="player">
+      <div class="player-loading">
+        <div class="spinner"></div>
+        <p>Loading player...</p>
+      </div>
+    </div>
+
+    <!-- JWPlayer Library -->
+    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+
+    <!-- Player Script -->
+    <script src="script.js"></script>
   </body>
-  <script src="script.js"></script>
 </html>
