@@ -148,7 +148,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
                                     size="lg"
                                     className="gap-2 text-base md:text-lg px-6 md:px-8"
                                 >
-                                    <Link href={`/watch/${movie.folderId}/${movie.id}`}>
+                                    <Link href={`/watch/${movie.folderId || 'unknown'}/${movie.id}`}>
                                         <Play className="w-5 h-5 md:w-6 md:h-6 fill-black" />
                                         Play
                                     </Link>

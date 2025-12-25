@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listFolderContents } from "@/lib/gdrive";
+import { listFolderContents, getFileMetadata } from "@/lib/gdrive";
 import type { DriveFile } from "@/lib/gdrive";
 import {
   parseMediaFilename,
@@ -76,13 +76,31 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     // Get folderId from query parameter
     const url = new URL(request.url);
-    const folderId = url.searchParams.get("folderId");
+    let folderId = url.searchParams.get("folderId");
 
-    if (!folderId) {
-      return NextResponse.json(
-        { error: "folderId query parameter is required" },
-        { status: 400 }
-      );
+    // If folderId is 'unknown' or missing, try to get it from file metadata
+    if (!folderId || folderId === "unknown") {
+      const fileMetadata = await getFileMetadata(fileId);
+      if (!fileMetadata) {
+        return NextResponse.json({ error: "Video not found" }, { status: 404 });
+      }
+      folderId = fileMetadata.parents?.[0] || null;
+
+      if (!folderId) {
+        // Can't find folder, but still try to play without subtitles
+        const parsed = parseMediaFilename(fileMetadata.name);
+        return NextResponse.json({
+          id: fileId,
+          folderId: "",
+          title: parsed?.title || "Unknown",
+          year: parsed?.year,
+          seasonNumber: parsed?.seasonNumber,
+          episodeNumber: parsed?.episodeNumber,
+          episodeTitle: parsed?.episodeTitle,
+          streamUrl: `/api/stream/${fileId}`,
+          subtitles: [],
+        });
+      }
     }
 
     // Get all files in the folder to find video name and subtitles
@@ -91,7 +109,10 @@ export async function GET(request: Request, { params }: RouteParams) {
     // Find the video file
     const videoFile = allFilesInFolder.find((f) => f.id === fileId);
     if (!videoFile) {
-      return NextResponse.json({ error: "Video not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Video not found in folder" },
+        { status: 404 }
+      );
     }
 
     // Parse the filename
