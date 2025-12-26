@@ -1,6 +1,9 @@
 import { MediaCard } from "@/components/media-card";
 import type { MediaLibrary, Movie } from "@/types/media";
 
+// Force dynamic rendering - this page fetches from API at runtime
+export const dynamic = "force-dynamic";
+
 async function getMovies(): Promise<Movie[]> {
     const isConfigured = Boolean(
         process.env.GD_SERVICE_B64 &&

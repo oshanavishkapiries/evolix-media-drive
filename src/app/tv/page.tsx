@@ -1,6 +1,9 @@
 import { MediaCard } from "@/components/media-card";
 import type { MediaLibrary, TVShow } from "@/types/media";
 
+// Force dynamic rendering - this page fetches from API at runtime
+export const dynamic = "force-dynamic";
+
 async function getTVShows(): Promise<TVShow[]> {
     const isConfigured = Boolean(
         process.env.GD_SERVICE_B64 &&

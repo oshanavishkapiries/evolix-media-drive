@@ -2,6 +2,9 @@ import { HeroBanner, HeroBannerSkeleton } from "@/components/hero-banner";
 import { MediaCarousel } from "@/components/media-carousel";
 import type { MediaLibrary } from "@/types/media";
 
+// Force dynamic rendering - this page fetches from API at runtime
+export const dynamic = "force-dynamic";
+
 // Demo data for initial display without Google Drive connection
 const demoLibrary: MediaLibrary = {
   movies: [
